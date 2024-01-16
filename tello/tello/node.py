@@ -33,7 +33,7 @@ class TelloNode():
 
         # Declare parameters
         self.node.declare_parameter('connect_timeout', 10.0)
-        self.node.declare_parameter('tello_ip', '192.168.10.1')
+        self.node.declare_parameter('tello_ip', '172.20.10.1')
         self.node.declare_parameter('tf_base', 'map')
         self.node.declare_parameter('tf_drone', 'drone')
         self.node.declare_parameter('tf_pub', False)
