@@ -19,12 +19,15 @@ find_package(geometry_msgs REQUIRED)
 # Declare ROS messages, services and actions
 set(msg_files
   "msg/TelloStatus.msg"
-  "msg/TelloID.msg"
-  "msg/TelloWifiConfig.msg"
+)
+
+set(action_files
+  "action/TelloCommand.action"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
+  ${action_files}
   DEPENDENCIES std_msgs geometry_msgs
   ADD_LINTER_TESTS
 )

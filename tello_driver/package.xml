@@ -2,8 +2,8 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>tello_driver</name>
-  <version>0.0.0</version>
-  <description>ROS2 driver package to control dji tello drone</description>
+  <version>0.0.1</version>
+  <description>ROS2 driver package to control tello edu drone</description>
   <maintainer email="kousheekc@gmail.com">kousheek</maintainer>
   <license>MIT</license>
 
