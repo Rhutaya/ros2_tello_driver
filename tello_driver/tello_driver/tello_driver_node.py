@@ -2,89 +2,95 @@ import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionServer
 
-import time
-import threading
-import numpy as np
-from djitellopy import Tello
-from cv_bridge import CvBridge
-
-from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Image
+from tello_msg.action import TelloCommand
 from tello_msg.msg import TelloStatus
 
-from tello_msg.action import TelloCommand
+import socket
 
 class TelloDriverNode(Node):
     def __init__(self):
         super().__init__('tello_driver_node')
 
-        self.tello = Tello()
-        self.tello.connect()
-        self.tello.streamon()
+        self.declare_parameter('tello_ip', '172.20.10.6')
+        self.declare_parameter('response_receive_port', 8889)
+        self.declare_parameter('video_receive_port', 11111)
+        self.declare_parameter('state_receive_port', 8890)
 
-        self.get_logger().info('Tello: Connected to drone')
+        self.action_server = ActionServer(self, TelloCommand, 'command', self.cb_command)
+        self.receive_state_timer = self.create_timer(0.1, self.receive_state)
 
-        self.bridge_ = CvBridge()
+        self.tello_ip = str(self.get_parameter('tello_ip').value)
 
-        self.action_server_ = ActionServer(self, TelloCommand, 'command', self.cb_command_)
+        self.control_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.state_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        self.control_socket.bind(('0.0.0.0', int(self.get_parameter('response_receive_port').value)))
+        self.state_socket.bind(('0.0.0.0', int(self.get_parameter('state_receive_port').value)))
+
+        self.control_socket.settimeout(10)
+        self.state_socket.settimeout(10)
+
+        r1 = self.send_command("command", True)
+        r2 = self.send_command(f"port {int(self.get_parameter('state_receive_port').value)} {int(self.get_parameter('video_receive_port').value)}", True)
+        r3 = self.send_command("streamon", True)
+
+        if (r1 and r2 and r3):
+            print("Connected to drone and setup complete")
+        else:
+            print("Error connecting to drone, shutting down node")
+
+    def extract(self, sub_str, str):
+        start_idx = str.find(sub_str)
+        if start_idx != -1:
+            end_idx = str.find(";", start_idx)
+            if end_idx != -1:
+                print(str[start_idx+len(sub_str)+1 : end_idx])
+                return 
+        else:
+            return None
+
+    def pub_state(self, data):
+        self.extract("agx", data)
+
+    def receive_state(self):
+        try:
+            data, address = self.state_socket.recvfrom(1024)
+            data = data.decode()
+            self.pub_state(data)
+
+        except Exception as e:
+            print(f"Error: {e}")
         
-        self.sub_control_ = self.create_subscription(Twist, 'cmd_vel', self.cb_control_, 1)
-        self.pub_image_ = self.create_publisher(Image, 'image_raw', 1)
-        self.pub_status_ = self.create_publisher(TelloStatus, 'status', 1)
+    def send_command(self, msg, response):
+        try:
+            self.control_socket.sendto(msg.encode(), (self.tello_ip, 8889))
+            if (response):
+                data, server = self.control_socket.recvfrom(1024)
+                response = data.decode()
+                if ("ok" in response):
+                    return True
+                else:
+                    return False
+            else:
+                return None
 
-        image_thread_ = threading.Thread(target=self.tello_video_thread_)
-        status_thread_ = threading.Thread(target=self.tello_status_thread_)
-        image_thread_.start()
-        status_thread_.start()
+        except socket.timeout:
+            print("Error: No response received within 10 seconds.")
+            return False
 
-    def tello_status_thread_(self, rate=1.0/10.0):
-        while True:
-            msg = TelloStatus()
-            msg.acceleration.x = self.tello.get_acceleration_x()
-            msg.acceleration.y = self.tello.get_acceleration_y()
-            msg.acceleration.z = self.tello.get_acceleration_z()
-            msg.speed.x = float(self.tello.get_speed_x())
-            msg.speed.y = float(self.tello.get_speed_y())
-            msg.speed.z = float(self.tello.get_speed_z())
-            msg.pitch = self.tello.get_pitch()
-            msg.roll = self.tello.get_roll()
-            msg.yaw = self.tello.get_yaw()
-            msg.barometer = int(self.tello.get_barometer())
-            msg.distance_tof = self.tello.get_distance_tof()
-            msg.fligth_time = self.tello.get_flight_time()
-            msg.battery = self.tello.get_battery()
-            msg.highest_temperature = self.tello.get_highest_temperature()
-            msg.lowest_temperature = self.tello.get_lowest_temperature()
-            msg.temperature = self.tello.get_temperature()
-            self.pub_status_.publish(msg)
-            
-            time.sleep(rate)
+        except Exception as e:
+            print(f"Error: {e}")
+            return False
 
-    def tello_video_thread_(self, rate=1.0/30.0):
-        frame_read = self.tello.get_frame_read()
-
-        while True:
-            frame = frame_read.frame
-
-            msg = self.bridge_.cv2_to_imgmsg(np.array(frame), 'rgb8')
-            msg.header.frame_id = "drone"
-            self.pub_image_.publish(msg)
-
-            time.sleep(rate)
-
-    def cb_command_(self, goal_handle):
-        self.get_logger().info(f'Executing command...{goal_handle.request.command}')
-
-        result = self.tello.send_control_command(goal_handle.request.command)
-
+    def cb_command(self, goal_handle):
+        result = self.send_command(goal_handle.request.command, True)
         if result:
             goal_handle.succeed()
 
-        result = TelloCommand.Result()
-        return result
+        action_result = TelloCommand.Result()
+        action_result.result = result
+        return action_result
 
-    def cb_control_(self, msg):
-        self.tello.send_rc_control(int(msg.linear.x*100), int(msg.linear.y*100), int(msg.linear.z*100), int(msg.angular.z*100))
 
 def main(args=None):
     rclpy.init(args=args)
@@ -95,7 +101,6 @@ def main(args=None):
 
     tello_driver_node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
