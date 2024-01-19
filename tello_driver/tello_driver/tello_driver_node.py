@@ -18,6 +18,8 @@ class TelloDriverNode(Node):
 
         self.action_server = ActionServer(self, TelloCommand, 'command', self.cb_command)
         self.receive_state_timer = self.create_timer(0.1, self.receive_state)
+        self.pub_status = self.create_publisher(TelloStatus, 'status', 1)
+
 
         self.tello_ip = str(self.get_parameter('tello_ip').value)
 
@@ -44,13 +46,24 @@ class TelloDriverNode(Node):
         if start_idx != -1:
             end_idx = str.find(";", start_idx)
             if end_idx != -1:
-                print(str[start_idx+len(sub_str)+1 : end_idx])
-                return 
+                return float(str[start_idx+len(sub_str)+1 : end_idx])
         else:
             return None
 
     def pub_state(self, data):
-        self.extract("agx", data)
+        msg = TelloStatus()
+        msg.acceleration.x = self.extract("agx", data)
+        msg.acceleration.y = self.extract("agy", data)
+        msg.acceleration.z = self.extract("agz", data)
+        msg.speed.x = self.extract("vgx", data)
+        msg.speed.y = self.extract("vgy", data)
+        msg.speed.z = self.extract("vgz", data)
+        msg.orientation.x = self.extract("pitch", data)
+        msg.orientation.y = self.extract("roll", data)
+        msg.orientation.z = self.extract("yaw", data)
+        msg.battery = self.extract("bat", data)
+        msg.distance_tof = self.extract("tof", data)
+        self.pub_status.publish(msg)
 
     def receive_state(self):
         try:
