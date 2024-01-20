@@ -7,6 +7,7 @@ from tello_msg.msg import TelloStatus
 from sensor_msgs.msg import Image
 
 import socket
+import threading
 import h264decoder
 import numpy as np
 from cv_bridge import CvBridge
@@ -20,26 +21,33 @@ class TelloDriverNode(Node):
         self.declare_parameter('state_receive_port', 8890)
         self.declare_parameter('video_receive_port', 11111)
 
-        self.action_server = ActionServer(self, TelloCommand, 'command', self.cb_command)
-        self.receive_state_timer = self.create_timer(0.1, self.receive_state)
-        self.receive_video_timer = self.create_timer(0.0001, self.receive_video)
-        
-        self.pub_status = self.create_publisher(TelloStatus, 'status', 1)
-        self.pub_image = self.create_publisher(Image, 'image_raw', 1)
-
         self.tello_ip = str(self.get_parameter('tello_ip').value)
 
+        self.action_server = ActionServer(self, TelloCommand, 'command', self.cb_command)
+        
+        self.status_thread = threading.Thread(target=self.status_receive_thread)
+        self.status_thread.daemon = True
+        self.status_pub_timer = self.create_timer(0.1, self.status_publish)
+        self.status_pub = self.create_publisher(TelloStatus, 'status', 1)
+        self.status_latest = None
+
+        self.frames_thread = threading.Thread(target=self.frames_receive_thread)
+        self.frames_thread.daemon = True
+        self.frames_pub_timer = self.create_timer(0.03, self.frames_publish)
+        self.frames_pub = self.create_publisher(Image, 'image_raw', 1)
+        self.frames_latest = None
+
         self.control_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.state_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.video_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.status_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.frames_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.control_socket.bind(('0.0.0.0', int(self.get_parameter('response_receive_port').value)))
-        self.state_socket.bind(('0.0.0.0', int(self.get_parameter('state_receive_port').value)))
-        self.video_socket.bind(('0.0.0.0', int(self.get_parameter('video_receive_port').value)))
+        self.status_socket.bind(('0.0.0.0', int(self.get_parameter('state_receive_port').value)))
+        self.frames_socket.bind(('0.0.0.0', int(self.get_parameter('video_receive_port').value)))
 
         self.control_socket.settimeout(10)
-        self.state_socket.settimeout(10)
-        self.video_socket.settimeout(10)
+        self.status_socket.settimeout(10)
+        self.frames_socket.settimeout(10)
 
         self.video_data = b''
         self.decoder = h264decoder.H264Decoder()
@@ -51,10 +59,58 @@ class TelloDriverNode(Node):
 
         if (r1 and r2 and r3):
             print("Connected to drone and setup complete")
+            self.status_thread.start()
+            self.frames_thread.start()
         else:
             print("Error connecting to drone, shutting down node")
 
-    def extract_state(self, sub_str, str):
+    def status_receive_thread(self):
+        while True:
+            try:
+                data, address = self.status_socket.recvfrom(1024)
+                self.status_latest = data.decode()
+
+            except Exception as e:
+                print(f"Error: {e}")
+
+    def frames_receive_thread(self):
+        while True:
+            try:
+                data, address = self.frames_socket.recvfrom(2048)
+
+                self.video_data += data
+                # end of frame
+                if len(data) != 1460:
+                    for frame in self.frames_decode(self.video_data):
+                        self.frames_latest = frame
+                    self.video_data = b''
+
+            except Exception as e:
+                print(f"Error: {e}")
+
+    def status_publish(self):
+        if (self.status_latest is not None):
+            msg = TelloStatus()
+            msg.acceleration.x = self.status_decode("agx", self.status_latest)
+            msg.acceleration.y = self.status_decode("agy", self.status_latest)
+            msg.acceleration.z = self.status_decode("agz", self.status_latest)
+            msg.speed.x = self.status_decode("vgx", self.status_latest)
+            msg.speed.y = self.status_decode("vgy", self.status_latest)
+            msg.speed.z = self.status_decode("vgz", self.status_latest)
+            msg.orientation.x = self.status_decode("pitch", self.status_latest)
+            msg.orientation.y = self.status_decode("roll", self.status_latest)
+            msg.orientation.z = self.status_decode("yaw", self.status_latest)
+            msg.battery = self.status_decode("bat", self.status_latest)
+            msg.distance_tof = self.status_decode("tof", self.status_latest)
+            self.status_pub.publish(msg)
+
+    def frames_publish(self):
+        if (self.frames_latest is not None):
+            msg = self.bridge.cv2_to_imgmsg(np.array(self.frames_latest), 'rgb8')
+            msg.header.frame_id = "drone"
+            self.frames_pub.publish(msg)
+
+    def status_decode(self, sub_str, str):
         start_idx = str.find(sub_str)
         if start_idx != -1:
             end_idx = str.find(";", start_idx)
@@ -63,28 +119,7 @@ class TelloDriverNode(Node):
         else:
             return None
 
-    def receive_state(self):
-        try:
-            data, address = self.state_socket.recvfrom(1024)
-            data = data.decode()
-            msg = TelloStatus()
-            msg.acceleration.x = self.extract_state("agx", data)
-            msg.acceleration.y = self.extract_state("agy", data)
-            msg.acceleration.z = self.extract_state("agz", data)
-            msg.speed.x = self.extract_state("vgx", data)
-            msg.speed.y = self.extract_state("vgy", data)
-            msg.speed.z = self.extract_state("vgz", data)
-            msg.orientation.x = self.extract_state("pitch", data)
-            msg.orientation.y = self.extract_state("roll", data)
-            msg.orientation.z = self.extract_state("yaw", data)
-            msg.battery = self.extract_state("bat", data)
-            msg.distance_tof = self.extract_state("tof", data)
-            self.pub_status.publish(msg)
-
-        except Exception as e:
-            print(f"Error: {e}")
-
-    def h264_decode(self, packet_data):
+    def frames_decode(self, packet_data):
         res_frame_list = []
         frames = self.decoder.decode(packet_data)
         for framedata in frames:
@@ -97,22 +132,6 @@ class TelloDriverNode(Node):
                 res_frame_list.append(frame)
 
         return res_frame_list
-
-    def receive_video(self):
-        try:
-            data, address = self.video_socket.recvfrom(2048)
-
-            self.video_data += data
-            # end of frame
-            if len(data) != 1460:
-                for frame in self.h264_decode(self.video_data):
-                    msg = self.bridge.cv2_to_imgmsg(np.array(frame), 'rgb8')
-                    msg.header.frame_id = "drone"
-                    self.pub_image.publish(msg)
-                self.video_data = b''
-
-        except Exception as e:
-            print(f"Error: {e}")
         
     def send_command(self, msg, response):
         try:
