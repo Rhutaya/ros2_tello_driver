@@ -18,7 +18,7 @@ class TelloDriverNode(Node):
         super().__init__('tello_driver_node')
 
         # Parameters
-        self.declare_parameter('tello_ip', '172.20.10.6')
+        self.declare_parameter('tello_ip', '192.168.10.1')
         self.declare_parameter('response_receive_port', 8889)
         self.declare_parameter('state_receive_port', 8890)
         self.declare_parameter('video_receive_port', 11111)
@@ -171,7 +171,7 @@ class TelloDriverNode(Node):
         action_result.result = result
         return action_result
     
-    def cb_control_(self, msg):
+    def cb_control(self, msg):
         self.send_command(f"rc {int(msg.linear.x*100)} {int(msg.linear.y*100)} {int(msg.linear.z*100)} {int(msg.angular.z*100)}", False)
 
 
