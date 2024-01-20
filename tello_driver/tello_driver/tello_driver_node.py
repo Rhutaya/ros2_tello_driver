@@ -4,6 +4,7 @@ from rclpy.action import ActionServer
 
 from tello_msg.action import TelloCommand
 from tello_msg.msg import TelloStatus
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
 
 import socket
@@ -16,6 +17,7 @@ class TelloDriverNode(Node):
     def __init__(self):
         super().__init__('tello_driver_node')
 
+        # Parameters
         self.declare_parameter('tello_ip', '172.20.10.6')
         self.declare_parameter('response_receive_port', 8889)
         self.declare_parameter('state_receive_port', 8890)
@@ -23,20 +25,30 @@ class TelloDriverNode(Node):
 
         self.tello_ip = str(self.get_parameter('tello_ip').value)
 
-        self.action_server = ActionServer(self, TelloCommand, 'command', self.cb_command)
+        # Action server for commands (takeoff, land, etc)
+        self.command_server = ActionServer(self, TelloCommand, 'command', self.cb_command)
         
+        # Status receive thread related
         self.status_thread = threading.Thread(target=self.status_receive_thread)
         self.status_thread.daemon = True
         self.status_pub_timer = self.create_timer(0.1, self.status_publish)
-        self.status_pub = self.create_publisher(TelloStatus, 'status', 1)
         self.status_latest = None
 
+        # Video receive thread related
         self.frames_thread = threading.Thread(target=self.frames_receive_thread)
         self.frames_thread.daemon = True
         self.frames_pub_timer = self.create_timer(0.03, self.frames_publish)
-        self.frames_pub = self.create_publisher(Image, 'image_raw', 1)
         self.frames_latest = None
+        self.frames_raw_data = b''
+        self.decoder = h264decoder.H264Decoder()
+        self.bridge = CvBridge()
 
+        # Publishers and subscribers
+        self.status_pub = self.create_publisher(TelloStatus, 'status', 1)
+        self.frames_pub = self.create_publisher(Image, 'image_raw', 1)
+        self.control_sub = self.create_subscription(Twist, 'cmd_vel', self.cb_control, 1)
+
+        # Socket related
         self.control_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.status_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.frames_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -48,10 +60,6 @@ class TelloDriverNode(Node):
         self.control_socket.settimeout(10)
         self.status_socket.settimeout(10)
         self.frames_socket.settimeout(10)
-
-        self.video_data = b''
-        self.decoder = h264decoder.H264Decoder()
-        self.bridge = CvBridge()
 
         r1 = self.send_command("command", True)
         r2 = self.send_command(f"port {int(self.get_parameter('state_receive_port').value)} {int(self.get_parameter('video_receive_port').value)}", True)
@@ -78,12 +86,12 @@ class TelloDriverNode(Node):
             try:
                 data, address = self.frames_socket.recvfrom(2048)
 
-                self.video_data += data
+                self.frames_raw_data += data
                 # end of frame
                 if len(data) != 1460:
-                    for frame in self.frames_decode(self.video_data):
+                    for frame in self.frames_decode(self.frames_raw_data):
                         self.frames_latest = frame
-                    self.video_data = b''
+                    self.frames_raw_data = b''
 
             except Exception as e:
                 print(f"Error: {e}")
@@ -162,6 +170,9 @@ class TelloDriverNode(Node):
         action_result = TelloCommand.Result()
         action_result.result = result
         return action_result
+    
+    def cb_control_(self, msg):
+        self.send_command(f"rc {int(msg.linear.x*100)} {int(msg.linear.y*100)} {int(msg.linear.z*100)} {int(msg.angular.z*100)}", False)
 
 
 def main(args=None):
