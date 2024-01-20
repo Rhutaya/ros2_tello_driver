@@ -23,7 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'tello_driver = tello_driver.tello_driver_node:main'
+            'tello_driver = tello_driver.tello_driver_node:main',
+            'connect_wifi = tello_driver.connect_wifi_client:main'
         ],
     },
 )
