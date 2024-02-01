@@ -46,5 +46,5 @@ ros2 launch tello_driver ap_multiple_launch.py
 ## Contact
 Kousheek Chakraborty - kousheekc@gmail.com
 
-Project Link: [https://github.com/MRT-Codebase/ros2_tello_driver](https://github.com/MRT-Codebase/ros2_tello_driver)
+Project Link: [https://github.com/kousheekc/ros2_tello_driver.git](https://github.com/kousheekc/ros2_tello_driver.git)
 
