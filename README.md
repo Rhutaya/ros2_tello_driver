@@ -17,7 +17,7 @@ To install the Tello driver:
 ```
 mkdir tello_ws && cd tello_ws
 mkdir src && cd src
-git clone https://github.com/MRT-Codebase/ros2_tello_driver.git
+git clone https://github.com/kousheekc/ros2_tello_driver.git
 colcon build
 source install/setup.bash
 ```
