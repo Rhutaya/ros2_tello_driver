@@ -1,0 +1,124 @@
+[INFO] [launch]: All log files can be found below /home/arthur/.ros/log/2024-02-08-17-55-04-912388-arthur-UX430UAR-6595
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [tello_driver-1]: process started with pid [6597]
+[INFO] [tello_nav-2]: process started with pid [6599]
+[INFO] [joy_node-3]: process started with pid [6601]
+[joy_node-3] [INFO] [1707411305.299133685] [joy_node]: Opened joystick: Wireless Controller.  deadzone: 0.050000
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] non-existing PPS 0 referenced
+[tello_driver-1] [h264 @ 0x229b2c0] decode_slice_header error
+[tello_driver-1] [h264 @ 0x229b2c0] no frame!
+[tello_nav-2] [INFO] [1707411309.003050780] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='takeoff')
+[tello_nav-2] [INFO] [1707411309.028495039] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='takeoff')
+[tello_driver-1] [h264 @ 0x229b2c0] error while decoding MB 2 41, bytestream -7
+[tello_driver-1] [h264 @ 0x229b2c0] concealing 287 DC, 287 AC, 287 MV errors in P frame
+[tello_nav-2] [INFO] [1707411313.160778432] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.211827253] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.263486929] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.314233934] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.365194805] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.415941733] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.466218496] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.517767401] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.568771570] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.619909791] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411313.671005016] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_driver-1] [WARN] [1707411314.519294793] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 68 102 147 158  77  65  73  64 140 194 119 112  20   3 250 138]
+[tello_driver-1] [WARN] [1707411318.035225274] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 23 251 245 127 155  42  66 138 180  47  24 219 106 152 252  12]
+[tello_driver-1] [WARN] [1707411318.055280975] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [102 186  49 216  77  40  79  76 179 176 142 189  47  53  86 134]
+[tello_driver-1] [WARN] [1707411318.089972285] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 85 245 132  41 239  22  78  57 140  91  98 223 208  90 140 252]
+[tello_driver-1] [WARN] [1707411318.099931033] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 32  43 127  82  74 216  65   7 173 212  61 130 120 110 231  17]
+[tello_driver-1] [WARN] [1707411318.137042177] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 65   3 189  66  38 113  77   0 146  49 159   8 231  34 150   8]
+[tello_driver-1] [WARN] [1707411318.148807653] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [110 118 124  50 115  76  70  38 163 225  70 141 224 208 242 242]
+[tello_driver-1] [WARN] [1707411318.188939804] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 29  94  91  90 223 219  66 231 157 116 206 172  80  93 197  28]
+[tello_driver-1] [WARN] [1707411318.208913390] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 23 179  54 105  67  66  74  78 157 238  85  11  70  20  39 154]
+[tello_driver-1] [WARN] [1707411318.240626109] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [223 158 213 212 251 209  68  72 158 121 227 109 234 166 177  43]
+[tello_driver-1] [WARN] [1707411318.260477371] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [188 150  95 234 123  94  73   6 137 135  59 164 104 163 132  65]
+[tello_nav-2] [INFO] [1707411328.423441108] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='takeoff')
+[tello_driver-1] [WARN] [1707411328.431939313] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [217  91  86 154  20  97  78 248 168 130  16 246  96 165 179  33]
+[tello_nav-2] [INFO] [1707411332.916618813] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411340.077984311] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411340.129057629] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_driver-1] [WARN] [1707411343.849265646] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 19  21 209 227 161 136  64  45 134  60 186  95  53 160 164 114]
+[tello_nav-2] [INFO] [1707411382.534299103] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='takeoff')
+[tello_nav-2] [INFO] [1707411382.586236563] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='takeoff')
+[tello_driver-1] [WARN] [1707411382.619431660] [tello_driver]: Goal state not set, assuming aborted. Goal ID: [ 24 178 131  98 164  59  64 126 142  67 246  97 186 177 139 225]
+[tello_driver-1] [h264 @ 0x229b2c0] concealing 1904 DC, 1904 AC, 1904 MV errors in P frame
+[tello_nav-2] [INFO] [1707411398.283416144] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_nav-2] [INFO] [1707411398.333020126] [tello_nav]: tello_msg.action.TelloCommand_Goal(command='land')
+[tello_driver-1] [h264 @ 0x229b2c0] left block unavailable for requested intra mode
+[tello_driver-1] [h264 @ 0x229b2c0] error while decoding MB 0 30, bytestream 1236
+[tello_driver-1] [h264 @ 0x229b2c0] concealing 949 DC, 949 AC, 949 MV errors in P frame
+[tello_driver-1] [h264 @ 0x229b2c0] error while decoding MB 44 43, bytestream -6
+[tello_driver-1] [h264 @ 0x229b2c0] concealing 125 DC, 125 AC, 125 MV errors in P frame
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[joy_node-3] [INFO] [1707411417.852222786] [rclcpp]: signal_handler(signal_value=2)
+[tello_nav-2] Traceback (most recent call last):
+[tello_nav-2]   File "/home/arthur/tello_ws/install/tello_nav/lib/tello_nav/tello_nav", line 11, in <module>
+[tello_nav-2]     load_entry_point('tello-nav', 'console_scripts', 'tello_nav')()
+[tello_nav-2]   File "/home/arthur/tello_ws/build/tello_nav/tello_nav/tello_nav_handle.py", line 60, in main
+[tello_nav-2]     rclpy.spin(tello_nav)
+[tello_nav-2]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/__init__.py", line 191, in spin
+[tello_nav-2]     executor.spin_once()
+[tello_nav-2]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 711, in spin_once
+[tello_nav-2]     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+[tello_nav-2]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 697, in wait_for_ready_callbacks
+[tello_nav-2]     return next(self._cb_iter)
+[tello_nav-2]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 593, in _wait_for_ready_callbacks
+[tello_nav-2]     _rclpy.rclpy_wait(wait_set, timeout_nsec)
+[tello_nav-2] KeyboardInterrupt
+[tello_driver-1] Traceback (most recent call last):
+[tello_driver-1]   File "/home/arthur/tello_ws/install/tello_driver/lib/tello_driver/tello_driver", line 11, in <module>
+[tello_driver-1]     load_entry_point('tello-driver', 'console_scripts', 'tello_driver')()
+[tello_driver-1]   File "/home/arthur/tello_ws/build/tello_driver/tello_driver/tello_driver_node.py", line 183, in main
+[tello_driver-1]     rclpy.spin(tello_driver_node)
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/__init__.py", line 191, in spin
+[tello_driver-1]     executor.spin_once()
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 717, in spin_once
+[tello_driver-1]     handler()
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/task.py", line 239, in __call__
+[tello_driver-1]     self._handler.send(None)
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 429, in handler
+[tello_driver-1]     await call_coroutine(entity, arg)
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 343, in _execute_timer
+[tello_driver-1]     await await_or_execute(tmr.callback)
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/rclpy/executors.py", line 118, in await_or_execute
+[tello_driver-1]     return callback(*args)
+[tello_driver-1]   File "/home/arthur/tello_ws/build/tello_driver/tello_driver/tello_driver_node.py", line 117, in frames_publish
+[tello_driver-1]     msg = self.bridge.cv2_to_imgmsg(np.array(self.frames_latest), 'rgb8')
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/cv_bridge/core.py", line 274, in cv2_to_imgmsg
+[tello_driver-1]     img_msg.encoding = encoding
+[tello_driver-1]   File "/opt/ros/foxy/lib/python3.8/site-packages/sensor_msgs/msg/_image.py", line 208, in encoding
+[tello_driver-1]     isinstance(value, str), \
+[tello_driver-1] KeyboardInterrupt
+[ERROR] [tello_nav-2]: process has died [pid 6599, exit code -2, cmd '/home/arthur/tello_ws/install/tello_nav/lib/tello_nav/tello_nav --ros-args -r __node:=tello_nav'].
+[ERROR] [tello_driver-1]: process has died [pid 6597, exit code -2, cmd '/home/arthur/tello_ws/install/tello_driver/lib/tello_driver/tello_driver --ros-args -r __node:=tello_driver'].
+[INFO] [joy_node-3]: process has finished cleanly [pid 6601]
