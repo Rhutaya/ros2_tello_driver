@@ -6,9 +6,6 @@ from tello_msg.action import TelloCommand
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy, Image
 
-import cv2
-from cv_bridge import CvBridge
-
 class NavActionClient(Node):
 
     def __init__(self):
@@ -17,11 +14,9 @@ class NavActionClient(Node):
         self.control_pub_timer = self.create_timer(0.1, self.control_publish)
         
         self.joy_sub = self.create_subscription(Joy, 'joy', self.joy_callback, 10)
-        # self.frames_sub = self.create_subscription(Image, 'image_raw', self.frames_callback, 10) # Not wanted for the next
         self.control_pub = self.create_publisher(Twist, 'cmd_vel', 1)
-        
-        self.cv_bridge = CvBridge()
-        
+
+        self.prev_carre_state = 0
         self.pad = Pad()
         self.cmd = VelCommand()
         self.takeoff = 0
@@ -59,32 +54,22 @@ class NavActionClient(Node):
         if self.pad.buttons["rond"] == 1:
             self.send_goal("land")
             
-        if self.pad.buttons["carre"] == 1 and self.downcam == 0:
-            self.send_goal("downvision " + str(self.downcam))
-            self.downcam = 1
-        elif self.pad.buttons["carre"] == 1 and self.downcam == 1:
-            self.send_goal("downvision " + str(self.downcam))
-            self.downcam = 0
+        if self.pad.buttons["carre"] == 1 and self.prev_carre_state == 0:
+            if self.downcam == 0:
+                self.send_goal("downvision 1")
+                self.downcam = 1
+            else:
+                self.send_goal("downvision 0")
+                self.downcam = 0
+        
+        self.prev_carre_state = self.pad.buttons["carre"]
          
         self.cmd.lin_y = self.pad.axes["L3V"]
         self.cmd.lin_x = - self.pad.axes["R3H"]
         self.cmd.lin_z = self.pad.axes["R3V"]
         self.cmd.rot_z = - self.pad.axes["L3H"]
-        
-    def frames_callback(self, msg):
-        try:
-            # Convert ROS Image message to OpenCV image
-            # cv_image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
-            pass
 
-            # Process the image (you can add your image processing code here)
-            # For example, display the image
-            # cv2.imshow("Image from /raw_data", cv_image)
-            # cv2.waitKey(1)  # Adjust the delay as needed
 
-        except Exception as e:
-            print(f"Error processing image: {str(e)}")
-        
 class Pad():
     def __init__(self):
         self.header = {"sec":0.0, "nanosec":0.0, "frame_id":0.0}

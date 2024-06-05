@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
             'tello_nav = tello_nav.tello_nav_handle:main',
             'pub_only = tello_nav.simple_pub:main',
+            'marker_bridge = tello_nav.marker_bridge_node:main'
         ],
     },
 )

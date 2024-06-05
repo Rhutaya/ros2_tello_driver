@@ -14,6 +14,11 @@ def generate_launch_description():
             name='tello_nav',
         ),
         Node(
+            package='tello_nav',
+            executable='marker_bridge',
+            name='marker_bridge',
+        ),
+        Node(
             package='joy',
             executable='joy_node',
             name='joy_node',

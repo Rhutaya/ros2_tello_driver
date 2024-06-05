@@ -5,8 +5,9 @@ from rclpy.action import ActionServer
 from tello_msg.action import TelloCommand
 from tello_msg.msg import TelloStatus
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CameraInfo
 
+import yaml
 import socket
 import threading
 import h264decoder
@@ -43,9 +44,19 @@ class TelloDriverNode(Node):
         self.decoder = h264decoder.H264Decoder()
         self.bridge = CvBridge()
 
+        # Camera info publisher related
+        self.fname_cam_down = '/home/arthur/tello_ws/src/ros2_tello_driver/tello_bringup/config/camera_info_down_v2.yaml'
+        self.fname_cam_front = '/home/arthur/tello_ws/src/ros2_tello_driver/tello_bringup/config/camera_info_front_v2.yaml'
+        self.front_camera_info_msg = None
+        self.down_camera_info_msg = None
+        
+        self.load_camera_info()
+        self.camera_info_pub_timer = self.create_timer(0.1, self.camera_info_publish)
+
         # Publishers and subscribers
         self.status_pub = self.create_publisher(TelloStatus, 'status', 1)
         self.frames_pub = self.create_publisher(Image, 'image_raw', 1)
+        self.camera_info_pub = self.create_publisher(CameraInfo, 'camera_info', 1)
         self.control_sub = self.create_subscription(Twist, 'cmd_vel', self.cb_control, 1)
 
         # Socket related
@@ -71,6 +82,26 @@ class TelloDriverNode(Node):
             self.frames_thread.start()
         else:
             print("Error connecting to drone, shutting down node")
+
+    def load_camera_info(self):
+        try:
+
+            with open(self.fname_cam_front, "r") as file_handle:
+                calib_data = yaml.safe_load(file_handle)
+
+            # Parse
+            self.front_camera_info_msg = CameraInfo()
+            self.front_camera_info_msg.header.frame_id = 'camera'
+            self.front_camera_info_msg.width = calib_data["image_width"]
+            self.front_camera_info_msg.height = calib_data["image_height"]
+            self.front_camera_info_msg.k = calib_data["camera_matrix"]["data"]
+            self.front_camera_info_msg.d = calib_data["distortion_coefficients"]["data"]
+            self.front_camera_info_msg.r = calib_data["rectification_matrix"]["data"]
+            self.front_camera_info_msg.p = calib_data["projection_matrix"]["data"]
+            self.front_camera_info_msg.distortion_model = calib_data["distortion_model"]
+
+        except Exception as e:
+            print(f"Error: {e}")
 
     def status_receive_thread(self):
         while True:
@@ -115,8 +146,14 @@ class TelloDriverNode(Node):
     def frames_publish(self):
         if (self.frames_latest is not None):
             msg = self.bridge.cv2_to_imgmsg(np.array(self.frames_latest), 'rgb8')
+            msg.header.stamp = self.get_clock().now().to_msg()
             msg.header.frame_id = "drone"
             self.frames_pub.publish(msg)
+
+    def camera_info_publish(self):
+        if (self.front_camera_info_msg is not None):
+            self.front_camera_info_msg.header.stamp = self.get_clock().now().to_msg()
+            self.camera_info_pub.publish(self.front_camera_info_msg)
 
     def status_decode(self, sub_str, str):
         start_idx = str.find(sub_str)
