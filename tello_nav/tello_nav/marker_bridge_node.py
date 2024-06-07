@@ -47,11 +47,11 @@ class MarkerBridge(Node):
                 marker.scale.y = 0.1
                 marker.scale.z = 0.1
 
-                # # Set the color
-                # marker.color.r = 0.0
-                # marker.color.g = 1.0
-                # marker.color.b = 0.0
-                # marker.color.a = 1.0
+                # Set the color
+                marker.color.r = 0.0
+                marker.color.g = 1.0
+                marker.color.b = 0.0
+                marker.color.a = 1.0
 
                 # Set the lifetime
                 marker.lifetime.sec = 0
